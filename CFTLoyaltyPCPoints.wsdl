@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!-- edited with XMLSpy v2012 sp1 (http://www.altova.com) by user (CJSC “ZOLOTAYA KORONA”) -->
+<definitions xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ns="urn:cftlpc_points" targetNamespace="urn:cftlpc_points">
+	<import namespace="urn:cftlpc_points" location="CFTLoyaltyPCPoints_Types.xsd"/>
+	<message name="ActivateSoapIn">
+		<part name="request" type="ns:AuthRequestData"/>
+	</message>
+	<message name="ActivateSoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="LinkCardSoapIn">
+		<part name="request" type="ns:LinkRequestData"/>
+	</message>
+	<message name="LinkCardSoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="ReplaceCardSoapIn">
+		<part name="request" type="ns:LinkRequestData"/>
+	</message>
+	<message name="ReplaceCardSoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="GetInfoSoapIn">
+		<part name="transaction" type="ns:TransactionData"/>
+	</message>
+	<message name="GetInfoSoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="GetInfo2SoapIn">
+		<part name="request" type="ns:InfoRequestData"/>
+	</message>
+	<message name="GetInfo2SoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="AuthPointsSoapIn">
+		<part name="request" type="ns:AuthRequestData"/>
+	</message>
+	<message name="AuthPointsSoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="AuthGiftSoapIn">
+		<part name="request" type="ns:AuthRequestData"/>
+	</message>
+	<message name="AuthGiftSoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="ReverseSoapIn">
+		<part name="transaction" type="ns:TransactionData"/>
+	</message>
+	<message name="ReverseSoapOut">
+		<part name="status" type="ns:ResponseStatus"/>
+	</message>
+	<message name="BatchLoadSoapIn">
+		<part name="request" type="ns:BatchRequestData"/>
+	</message>
+	<message name="BatchLoadSoapOut">
+		<part name="status" type="ns:ResponseStatus"/>
+	</message>
+	<message name="RefundSoapIn">
+		<part name="request" type="ns:RefundRequestData"/>
+	</message>
+	<message name="RefundSoapOut">
+		<part name="response" type="ns:RefundResponseData"/>
+	</message>
+	<message name="EchoSoapIn">
+		<part name="request" type="xs:string"/>
+	</message>
+	<message name="EchoSoapOut">
+		<part name="response" type="xs:string"/>
+	</message>
+	<message name="GetAuthTokenSoapIn">
+		<part name="request" type="ns:AuthRequestData"/>
+	</message>
+	<message name="GetAuthTokenSoapOut">
+		<part name="response" type="ns:TokenResponseData"/>
+	</message>
+	<message name="DirectPointsSoapIn">
+		<part name="request" type="ns:DirectRequestData"/>
+	</message>
+	<message name="DirectPointsSoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="SetCardholderSoapIn">
+		<part name="request" type="ns:CardholderRequestData"/>
+	</message>
+	<message name="SetCardholderSoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="GetInfoDealsSoapIn">
+		<part name="request" type="ns:TransactionData"/>
+	</message>
+	<message name="GetInfoDealsSoapOut">
+		<part name="response" type="ns:InfoDealsResponseData"/>
+	</message>
+	<message name="AuthDealsSoapIn">
+		<part name="request" type="ns:AuthDealsRequestData"/>
+	</message>
+	<message name="AuthDealsSoapOut">
+		<part name="response" type="ns:AuthResponseData"/>
+	</message>
+	<message name="IssueDealSoapIn">
+		<part name="request" type="ns:IssueDealRequestData"/>
+	</message>
+	<message name="IssueDealSoapOut">
+		<part name="response" type="ns:IssueDealResponseData"/>
+	</message>	
+	<message name="GetInfoCashBackSoapIn">
+		<part name="request" type="ns:TransactionData"/>
+	</message>
+	<message name="GetInfoCashBackSoapOut">
+		<part name="response" type="ns:InfoCashBackResponseData"/>
+	</message>		
+	<portType name="CFTLoyaltyPCPoints_SoapPortType">
+		<operation name="activate">
+			<input message="ns:ActivateSoapIn"/>
+			<output message="ns:ActivateSoapOut"/>
+		</operation>
+		<operation name="linkCard">
+			<input message="ns:LinkCardSoapIn"/>
+			<output message="ns:LinkCardSoapOut"/>
+		</operation>
+		<operation name="replaceCard">
+			<input message="ns:ReplaceCardSoapIn"/>
+			<output message="ns:ReplaceCardSoapOut"/>
+		</operation>
+		<operation name="getInfo">
+			<input message="ns:GetInfoSoapIn"/>
+			<output message="ns:GetInfoSoapOut"/>
+		</operation>
+		<operation name="getInfo2">
+			<input message="ns:GetInfo2SoapIn"/>
+			<output message="ns:GetInfo2SoapOut"/>
+		</operation>
+		<operation name="authPoints">
+			<input message="ns:AuthPointsSoapIn"/>
+			<output message="ns:AuthPointsSoapOut"/>
+		</operation>
+		<operation name="authGift">
+			<input message="ns:AuthGiftSoapIn"/>
+			<output message="ns:AuthGiftSoapOut"/>
+		</operation>
+		<operation name="reverse">
+			<input message="ns:ReverseSoapIn"/>
+			<output message="ns:ReverseSoapOut"/>
+		</operation>
+		<operation name="batchLoad">
+			<input message="ns:BatchLoadSoapIn"/>
+			<output message="ns:BatchLoadSoapOut"/>
+		</operation>
+		<operation name="refund">
+			<input message="ns:RefundSoapIn"/>
+			<output message="ns:RefundSoapOut"/>
+		</operation>
+		<operation name="echo">
+			<input message="ns:EchoSoapIn"/>
+			<output message="ns:EchoSoapOut"/>
+		</operation>
+		<operation name="getAuthToken">
+			<input message="ns:GetAuthTokenSoapIn"/>
+			<output message="ns:GetAuthTokenSoapOut"/>
+		</operation>
+		<operation name="directPoints">
+			<input message="ns:DirectPointsSoapIn"/>
+			<output message="ns:DirectPointsSoapOut"/>
+		</operation>
+		<operation name="setCardholder">
+			<input message="ns:SetCardholderSoapIn"/>
+			<output message="ns:SetCardholderSoapOut"/>
+		</operation>
+		<operation name="getInfoDeals">
+			<input message="ns:GetInfoDealsSoapIn"/>
+			<output message="ns:GetInfoDealsSoapOut"/>
+		</operation>
+		<operation name="authDeals">
+			<input message="ns:AuthDealsSoapIn"/>
+			<output message="ns:AuthDealsSoapOut"/>
+		</operation>
+		<operation name="issueDeal">
+			<input message="ns:IssueDealSoapIn"/>
+			<output message="ns:IssueDealSoapOut"/>
+		</operation>
+		<operation name="getInfoCashBack">
+			<input message="ns:GetInfoCashBackSoapIn"/>
+			<output message="ns:GetInfoCashBackSoapOut"/>
+		</operation>		
+	</portType>
+	<binding name="CFTLoyaltyPCPoints_SoapBinding" type="ns:CFTLoyaltyPCPoints_SoapPortType">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="activate">
+			<soap:operation soapAction="urn:#activate"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="linkCard">
+			<soap:operation soapAction="urn:#linkCard"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="replaceCard">
+			<soap:operation soapAction="urn:#replaceCard"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="getInfo">
+			<soap:operation soapAction="urn:#getInfo"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="getInfo2">
+			<soap:operation soapAction="urn:#getInfo2"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="authPoints">
+			<soap:operation soapAction="urn:#authPoints"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="authGift">
+			<soap:operation soapAction="urn:#authGift"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="reverse">
+			<soap:operation soapAction="urn:#reverse"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="batchLoad">
+			<soap:operation soapAction="urn:#batchLoad"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="refund">
+			<soap:operation soapAction="urn:#refund"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="echo">
+			<soap:operation soapAction="urn:#echo"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="getAuthToken">
+			<soap:operation soapAction="urn:#getAuthToken"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="directPoints">
+			<soap:operation soapAction="urn:#directPoints"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="setCardholder">
+			<soap:operation soapAction="urn:#setCardholder"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="getInfoDeals">
+			<soap:operation soapAction="urn:#getInfoDeals"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="authDeals">
+			<soap:operation soapAction="urn:#authDeals"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="issueDeal">
+			<soap:operation soapAction="urn:#issueDeal"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="getInfoCashBack">
+			<soap:operation soapAction="urn:#getInfoCashBack"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>		
+	</binding>
+	<service name="CFTLoyaltyPCPoints_Service">
+		<port name="CFTLoyaltyPCPoints_SoapPort" binding="ns:CFTLoyaltyPCPoints_SoapBinding">
+			<soap:address location="http://localhost:4101/axis/services/CFTLoyaltyPCPoints_SoapPort"/>
+		</port>
+	</service>
+</definitions>

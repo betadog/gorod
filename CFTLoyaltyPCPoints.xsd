@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!-- edited with XMLSpy v2011 rel. 3 sp1 (http://www.altova.com) by user (Closed joint stock company “CENTER OF FINANCIAL TECHNOLOGIES” (CJSC “CFT”)) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns="urn:cftlpc_points" targetNamespace="urn:cftlpc_points">
+	<xs:include schemaLocation="CFTLoyaltyPCPoints_Types.xsd"/>
+	<xs:element name="CFTLoyaltyPC_Points">
+		<xs:annotation>
+			<xs:documentation>root</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice>
+				<xs:element name="activate">
+					<xs:annotation>
+						<xs:documentation>Операция: Активация бонусной карты</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:AuthRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="linkCard">
+					<xs:annotation>
+						<xs:documentation>Операция: Привязка дополнительной карты</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:LinkRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="replaceCard">
+					<xs:annotation>
+						<xs:documentation>Операция: Замена карты</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:LinkRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="getInfo">
+					<xs:annotation>
+						<xs:documentation>Операция: Запрос информации по бонусной или подарочной карте</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="transaction" type="ns:TransactionData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="getInfoDeals">
+					<xs:annotation>
+						<xs:documentation>Операция: Запрос расширенного списка купонов по карте</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="transaction" type="ns:TransactionData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:InfoDealsResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="getInfoCashBack">
+					<xs:annotation>
+						<xs:documentation>Операция: Запрос информации об операциях, по которым можно сделать кэшбэк</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:TransactionData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:InfoCashBackResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="getInfo2">
+					<xs:annotation>
+						<xs:documentation>Операция: Запрос информации по бонусной или подарочной карте с вычислением суммы, которая может быть оплачена баллами</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:InfoRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="setCardholder">
+					<xs:annotation>
+						<xs:documentation>Операция: Обновить или загрузить данные держателя карты</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name="request" type="ns:CardholderRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="getAuthToken">
+					<xs:annotation>
+						<xs:documentation>Операция: Отправить кардхолдеру SMS-сообщение с токеном для online-авторизации</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:AuthRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:TokenResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="directPoints">
+					<xs:annotation>
+						<xs:documentation>Операция: Прямое зачисление или списание бонусов с контролем овердрафта</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:DirectRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="authPoints">
+					<xs:annotation>
+						<xs:documentation>Операция: Авторизация покупки с использованием бонусной карты</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:AuthRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="authGift">
+					<xs:annotation>
+						<xs:documentation>Операция: Авторизация покупки с использованием подарочной карты</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:AuthRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="authDeals">
+					<xs:annotation>
+						<xs:documentation>Операция: Авторизация гашения купонов</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:AuthDealsRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:AuthResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="issueDeal">
+					<xs:annotation>
+						<xs:documentation>Операция: Выпуск купона по карте</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:IssueDealRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:IssueDealResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="reverse">
+					<xs:annotation>
+						<xs:documentation>Операция: Откат (технологическая отмена) авторизации</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="transaction" type="ns:TransactionData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="status" type="ns:ResponseStatus">
+								<xs:annotation>
+									<xs:documentation>Данные ответа: Статус выполнения операции.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="batchLoad">
+					<xs:annotation>
+						<xs:documentation>Операция: Учет неавторизованных операций начисленния бонусов.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:BatchRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="status" type="ns:ResponseStatus">
+								<xs:annotation>
+									<xs:documentation>Данные ответа: Статус выполнения операции.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="refund">
+					<xs:annotation>
+						<xs:documentation>Операция: Возврат товара.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="ns:RefundRequestData">
+								<xs:annotation>
+									<xs:documentation>Данные запроса.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="ns:RefundResponseData">
+								<xs:annotation>
+									<xs:documentation>Данные ответа</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="echo">
+					<xs:annotation>
+						<xs:documentation>Операция: Проверка доступности ПЦ.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Данные запроса: Произвольная строка</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="response" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Данные ответа: Измененная строка запроса</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

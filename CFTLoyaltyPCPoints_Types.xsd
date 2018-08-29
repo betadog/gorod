@@ -1,0 +1,2715 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!-- edited with XMLSpy v2011 rel. 3 sp1 (http://www.altova.com) by user (Closed joint stock company “ZOLOTAYA KORONA” (CJSC “ZOLOTAYA KORONA”)) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns="urn:cftlpc_points" targetNamespace="urn:cftlpc_points">
+	<xs:complexType name="ResponseStatus">
+		<xs:annotation>
+			<xs:documentation>
+             Результат выполнения операции в ПЦ. Присутствует в ответе на любой запрос. Если не равен OK, то запрос считается не выполненным, состояние счета не измененено.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="code">
+				<xs:annotation>
+					<xs:documentation>
+                   Код результата выполнения операции.
+                   0 - OK - Запрос выполнен успешно.
+                   136 - ACCOUNT_BLOCKED - Счет карты заблокирован. Операция запрещена для всех карт, привязанных к данному счету
+                   137 - ACCOUNT_ALREADY_USED - Счёт уже использован
+                   151 - NOT_ENOUGH_POINTS - Запрошено списание суммы, превышающей текущий остаток на счете.
+                   152 - ILLEGAL_PAYMENT – Недопустимое списание. Например, в чеке есть запрещенные товары.
+                   156 - SMS_IMPOSSIBLE - Невозможно послать SMS-сообщение.
+                   157 - RESTRICTED_CARD - Карта ограничена. Списание запрещено.
+                   162 - CARD_BLOCKED - Карта заблокирована.
+                   163 - CARD_NOT_ACTIVATED – Карта не активирована.
+                   164 - CARD_EXPIRED – Карта просрочена.
+                   165 - CARD_ACTIVATED – Карта уже активирована.
+                   171 - LIMIT_EXCEED – Превышен лимит.
+                   172 - Service is temporary inaccessible – Сервис временно недоступен.
+                   181 - BAD_DEAL - Невозможно погасить купон(ы).
+                   203 - INVALID_PARTNER - Неизвестный идентификатор партнера (участника коалиции).
+                   214 - CARD_NOT_EXISTS - Неизвестная (незарегистрированная в ПЦ) карта.
+                   212 - TRANSACTION_NOT_FOUND - Транзакция с указанным идентификатором не найдена. Используется в операции reverse. Этот статус может трактоваться как успешный в том смысле, что ПЦ не зарегистрировал транзакцию, которую должен откатить по этой операции, значит и откатывать нечего.
+                   258 - INVALID_TERMINAL - Неизвестный терминал (касса).
+                   284 - TRANSACTION_ALREADY_REVERSED - Транзакция уже откачена в ПЦ. Используется в операции reverse.
+                   294 - DUPLICATED_TRANSACTION_ID - Транзакция с таким идентификатором уже зарегистрирована в ПЦ для данного POS.
+                   320 - UNKNOWN_CRITICAL_EXTENSION - Неизвестное критическое расширение в запросе.
+                   321 - BAD_EXTENSION - Плохой формат известного расширения.
+                   330 - ILLEGAL_ARGUMENT - Некорректное значение аргумента операции. В ответе с таким статусом тестовое сообщение description содержит имя некорректного параметра.
+                   340 - UNSUPPORTED_OPERATION - Запрошенная операция не поддерживается ПЦ.
+                   389 - AUTHENTICATION_FAILURE - Ошибка аутентификации.
+                   390 - AUTH_TOKEN_FAILURE - Ошибка аутентификации по токену.
+                   391 - AUTH_TOKEN_EXPIRED - Аутентификационный токен просрочен или использован.
+                   392 - AUTH_TOKEN_PHONE_WRONG – Указан неверный номер телефона при авторизации по токену
+                   991 - OTHER_ERROR - Другая ошибка. Состояние счета не было изменено.
+                   996 - INTERNAL_ERROR - Внутренняя ошибка ПЦ. При получении ответа с таким статусом, запрос должен быть отменен вызовом операции reverse, т.к. ПЦ не может гарантировать, что состояние счета было или не было изменено.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="description" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Текстовое описание причины отказа. Предназначено исключительно для журналирования, но не для показа клиенту. Если операция выполнена успешно, параметр может отсутствовать.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="500"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CardInfoItem">
+		<xs:annotation>
+			<xs:documentation>
+             Элемент информации по карте. Содержит информацию о состоянии или об изменении одного из элементов счета карты или держателя карты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:documentation>
+                   Имя элемента счета.
+                   BNS - Сумма доступных баллов.
+                   BNS_DELAY - Сумма отложенных баллов.
+                   CASH - Сумма покупок.
+                   A_DATE - Дата активации карты.
+                   A_ID - Участник коалиции (его partnerId), активировавший карту.
+                   E_DATE - Срок действия карты.
+                   NL - Фамилия (name, last). Язык: русский, кодировка: UTF-8.
+                   NF - Имя (name, first). Язык: русский, кодировка: UTF-8.
+                   NP - Отчество (name, patronymic). Язык: русский, кодировка: UTF-8.
+                   CS - Состояние карты (если она не заблокирована).
+                   AB - Сумма, доступная к оплате в валюте (пересчёт доступных баллов в валюту по курсу списания в ПЦ).
+                   EAN13 - Штрих-код карты лояльности.
+                   PAN -
+ПАН карты
+                   BD - Дата рождения (из анкеты).
+                   ID_DATA - Некоторый идентификатор карты. Значение, передаваемое в поле, согласовывается с клиентом. Присутствует по согласованию с клиентом.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="value">
+				<xs:annotation>
+					<xs:documentation>
+                   Значение состояния или изменения элемента счета.
+                   Реально тип данных этого параметра зависит от имени элемента счета:
+                   A_DATE, E_DATE - Дата-время в формате YYYYMMDDhhmmss.
+                   A_ID - partnerId.
+                   BNS, CASH - Сумма в минимальных единицах валюты со знаком, т.е. может быть отрицательной.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="type">
+				<xs:annotation>
+					<xs:documentation>
+                   S - state - Состояние счета после выполнения операции. Реальное состояние указывается для всех активных элементов счета.
+                   C - change - Изменение счета в результате выполнения операции. Изменения указываются только для тех элементов счета, которые реально изменились в ходе выполнения данной операции.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="relation">
+				<xs:annotation>
+					<xs:documentation>
+                   T - Данные по участнику коалиции.
+                   N - Данные по коалиции.
+                   G - Данные по группе предприятий</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CardInfo">
+		<xs:annotation>
+			<xs:documentation>
+             Информация по карте. Присутствует в ответе на любой запрос, кроме запроса отмены операции (reverse). Содержит актуальную информацию о счете карты или держателя карты на момент после выполнения текущего запроса.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:CardInfoItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                   Набор элементов информации по карте. Состав набора элементов зависит от настройки программы лояльности в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FmtCardInfoItem">
+		<xs:annotation>
+			<xs:documentation>
+             Элемент информации по карте. Содержит информацию о состоянии или об изменении одного из элементов счета карты или держателя карты в форматированном (готовом к печати) виде.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:documentation>
+                   Форматированное название элемента счета. Язык: русский, кодировка: UTF-8.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="value">
+				<xs:annotation>
+					<xs:documentation>
+                   Форматированное значение состояния или изменения элемента счета. Язык: русский, кодировка: UTF-8.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FmtCardInfo">
+		<xs:annotation>
+			<xs:documentation>
+             Информация по карте. Присутствует в ответе на любой запрос, кроме запроса отмены операции (reverse). Содержит актуальную информацию о счете карты или держателя карты в форматированном (готовом к печати) виде на момент после выполнения текущего запроса.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:FmtCardInfoItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                   Набор элементов информации по карте. Состав набора элементов зависит от настройки программы лояльности в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CardholderInfoItem">
+		<xs:annotation>
+			<xs:documentation>
+             Элемент информации о держателе карты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:documentation>
+                  Название элемента.
+                  email - адрес электронной почты;
+                  mobile-phone - номер мобильного телефона в формате XXXYYYYYYY, где XXX - код оператора, YYYYYYY - номер телефона);
+                  loyalty-agreement - флаг согласия на участие в программе лояльности; может принимать следующие значения: 0 (нет согласия) или 1 (есть согласие).
+               N.B. Значение данного поля является регистро-независимым (ПЦ хранит значение в верхнем регистре).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="value">
+				<xs:annotation>
+					<xs:documentation>
+                  Значение элемента.
+                  Текстовые значения передаются в кодировке UTF-8.
+                  Значения типа "Дата и время" выгружаются в формате YYYYMMDDhhmmss.
+                  Значения типа "Флаг" выгружаются в виде 0 (значение не установлено) или 1 (значение установлено).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CardholderInfoSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Информация о держателе карты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:CardholderInfoItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                  Набор элементов информации о держателе карты.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FormOptionsItem">
+		<xs:annotation>
+			<xs:documentation>
+             Некоторый атрибут или свойство анкеты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:documentation>
+                  Название элемента.
+                  blank-barcode - штрих-код бланка анкеты
+               N.B. Значение данного поля является регистро-независимым (ПЦ хранит значение в верхнем регистре).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="value">
+				<xs:annotation>
+					<xs:documentation>
+                  Значение элемента.
+                  Текстовые значения передаются в кодировке UTF-8.
+                  Значения типа "Дата и время" выгружаются в формате YYYYMMDDhhmmss.
+                  Значения типа "Флаг" выгружаются в виде 0 (значение не установлено) или 1 (значение установлено).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FormOptionsSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Набор атрибутов или свойств анкеты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:FormOptionsItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                  Набор атрибутов или свойств анкеты.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OperSummaryItem">
+		<xs:annotation>
+			<xs:documentation>
+             Информация о движении средств на счете карты или держателя карты, произошедших в результате операции.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:documentation>
+                   Имя элемента счета.
+                   BNS - Сумма накопленных бонусов.
+                   BNS_DELAY - Сумма отложенных баллов.
+                   CASH - Сумма покупок.
+            </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="relation">
+				<xs:annotation>
+					<xs:documentation>
+                   T - Данные по участнику коалиции.
+                   N - Данные по коалиции.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="before">
+				<xs:annotation>
+					<xs:documentation>
+                   Сумма на элементе счёта до движения по операции (в минимальных единицах).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:totalDigits value="18"/>
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amount">
+				<xs:annotation>
+					<xs:documentation>
+                   Изменение суммы на элементе счёта в ходе операции с точностью до знака (в минимальных единицах).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amountInc">
+				<xs:annotation>
+					<xs:documentation>
+                  Положительное изменение суммы на элементе счёта после движения по операции (в минимальных единицах).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amountDec">
+				<xs:annotation>
+					<xs:documentation>
+                   Взятое по модулю отрицательное изменение суммы на элементе счёта после движения по операции (в минимальных единицах).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="after">
+				<xs:annotation>
+					<xs:documentation>
+                   Сумма на элементе счёта после движения по операции (в минимальных единицах).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OperSummarySeq">
+		<xs:annotation>
+			<xs:documentation>
+             Информация о движениях средств на счете карты или держателя карты, произошедших в результате операции.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:OperSummaryItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                   Набор движений средств на счете карты или держателя карты, произошедших в результате операции.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AccStatementItem">
+		<xs:annotation>
+			<xs:documentation>
+             Элемент выписки со счета карты или держателя карты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="pcId">
+				<xs:annotation>
+					<xs:documentation>
+                   Уникальный идентификатор транзакции, присвоенный ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="operKind">
+				<xs:annotation>
+					<xs:documentation>
+                  Тип операции:
+                     "payment" - Оплата баллами;
+                     "bonus" - Начисление баллов;
+                     "refund_payment" - Возврат на оплату;
+                     "refund_bonus" - Возврат на начисление;
+                     "correction" - Корректировка;
+                     "replacement" - Замена.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="operDesc">
+				<xs:annotation>
+					<xs:documentation>
+                  Описание операции:
+                     "Оплата баллами";
+                     "Начисление баллов";
+                     "Возврат на оплату";
+                     "Возврат на начисление";
+                     "Корректировка";
+                     "Замена".
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="pcDateTime">
+				<xs:annotation>
+					<xs:documentation>
+                   Дата и время ПЦ совершения операции в формате YYYYMMDDhhmmss.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="dateTime">
+				<xs:annotation>
+					<xs:documentation>
+                   Локальные  для точки совершения операции дата и время в формате YYYYMMDDhhmmss.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="partnerName">
+				<xs:annotation>
+					<xs:documentation>
+                   Имя Участника, инициировавшего операцию. Язык: русский, кодировка: UTF-8.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="200"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="summary" type="ns:OperSummarySeq">
+				<xs:annotation>
+					<xs:documentation>
+                   Информация о движениях средств на счете карты или держателя карты, произошедших в результате операции. Может отсутствовать, если на счете не было движений средств.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AccStatementSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Выписка со счета карты или держателя карты. Содержит информацию об определённом количестве последних операций по счету карты или держателя карты на момент после выполнения текущего запроса. Количество операций определяется настройками в ПЦ, но не более 200.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:AccStatementItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                   Набор элементов выписки по карте. Количество элементов зависит от настройки в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EventItem">
+		<xs:annotation>
+			<xs:documentation>
+             Структура предназначена для передачи некоторого события. События состоят из кода события и текста к нему для печати кассиру. 
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="code">
+				<xs:annotation>
+					<xs:documentation>Код события</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="message" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Описание события</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EventSeq">
+		<xs:annotation>
+			<xs:documentation>
+            Список событий.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:EventItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                   Структура предназначена для передачи некоторого события. События состоят из кода события и текста к нему для печати кассиру. 
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AccStatementParams">
+		<xs:annotation>
+			<xs:documentation>
+             Параметры формирования выписки.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="countLimit" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Лимит на количество операций в выписке. Переопределяет настройку на ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="1"/>
+						<xs:maxInclusive value="200"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ExtParam">
+		<xs:annotation>
+			<xs:documentation>
+             Параметр расширения.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:documentation>
+                   Имя параметра.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="256"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="value">
+				<xs:annotation>
+					<xs:documentation>
+                   Значение параметра.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ExtParamSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Параметры расширения.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:ExtParam" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                   Параметр расширения.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Extension">
+		<xs:annotation>
+			<xs:documentation>
+             Дополнительные данные (расширение).
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="type">
+				<xs:annotation>
+					<xs:documentation>
+                   Тип (имя) расширения.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="critical">
+				<xs:annotation>
+					<xs:documentation>
+                   Признак критичности расширения.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="params" type="ns:ExtParamSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Набор параметров расширения.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ExtensionSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Набор расширений.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:Extension" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                   Расширение.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Authentication">
+		<xs:annotation>
+			<xs:documentation>
+             Данные для проверки подлинности авторизации.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="purchaseId">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор заказа / покупки.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="token" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Наименование токена.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TransactionData">
+		<xs:annotation>
+			<xs:documentation>
+             Общие данные запроса.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id">
+				<xs:annotation>
+					<xs:documentation>
+                   Уникальный для данного POS идентификатор транзакции. Присваивается на стороне клиента. ПЦ проверяет этот параметр на уникальность для данного POS и, в случае совпадения с идентификатором ранее зарегистрированной транзакции (даже если она была отменена операцией reverse), выдает ошибку с кодом DUPLICATED_TRANSACTION_ID.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="terminal">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор кассы – источника операции, под которым она зарегистрирована в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="location">
+				<xs:annotation>
+					<xs:documentation>
+                   Код места совершения операции (например, магазина).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="partnerId">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор Участника, под которым он зарегистрирован в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="track1" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные первого трека магнитной полосы. Обязательно присутствует при идентификации карты по первому треку магнитной полосы.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="76"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="track2" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные второго трека магнитной полосы. Обязательно присутствует при идентификации карты по второму треку магнитной полосы.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="37"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="track3" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные третьего трека магнитной полосы. Обязательно присутствует при идентификации карты по третьему треку магнитной полосы.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="104"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="barCode" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Штрих-код карты (EAN-13). Обязательно присутствует при идентификации карты по штрих-коду.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="128"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="pan" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Номер карты, напечатанный на карте. Обязательно присутствует при ручном вводе номера карты.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="19"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="hash" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Hash от номера карты.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="128"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="gcdata" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные чиповой карты ЗК в формате SN:ISO, где SN – серийный номер чиповой карты, ISO – ISO чиповой карты ЗК.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="100"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="cardholder" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Идентификационные данные держателя карты.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="100"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="phone" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Номер телефона. Обязательно присутствует при идентификации карты по номеру телефона. </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="30"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="dateTime">
+				<xs:annotation>
+					<xs:documentation>
+                   Локальные для точки совершения операции дата и время совершения операции в формате YYYYMMDDhhmmss. Используется только для журналирования транзакции. Значение этого параметра никак не может повлиять на порядок обработки транзакций в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="extensions" type="ns:ExtensionSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Набор расширений.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LinkRequestData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные запроса на привязку дополнительной карты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="transaction" type="ns:TransactionData">
+				<xs:annotation>
+					<xs:documentation>
+                   Общие данные транзакции.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="track1" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные первого трека магнитной полосы. Обязательно присутствует при идентификации карты по первому треку магнитной полосы.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="76"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="track2" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные второго трека магнитной полосы. Обязательно присутствует при идентификации карты по второму треку магнитной полосы.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="37"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="track3" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные третьего трека магнитной полосы. Обязательно присутствует при идентификации карты по третьему треку магнитной полосы.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="104"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="barCode" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Штрих-код карты (EAN-13). Обязательно присутствует при идентификации карты по штрих-коду.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="128"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="pan" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Номер карты, напечатанный на карте. Обязательно присутствует при ручном вводе номера карты.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="19"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="hash" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Hash от номера карты.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="128"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="gcdata" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные чиповой карты ЗК в формате SN:ISO, где SN – серийный номер чиповой карты, ISO – ISO чиповой карты ЗК.
+                  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="100"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PaymentItem">
+		<xs:annotation>
+			<xs:documentation>
+             Элемент данных оплаты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="payMeans">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор средства оплаты:
+                   P – бонусы (points)
+                   C – наличные (cash)
+                   Z – платежная карта системы Золотая Корона
+                   I – платежная карта международной платежной системы
+                   T – подарочный сертификат (gift Token)
+                   R – покупка в кредит (cRedit purchase)
+                   N - неавторизованные бонусы (Not authorized points)
+                   O – другие платежные инструменты (Others)
+                   S - "чужие" бонусы (бонусы, списанные в сети отличной от сети начисления)
+                   K - "чужая" банковская карта (сумма оплаты по картам МПС, не обслуживаемым в сети начисления)
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amount">
+				<xs:annotation>
+					<xs:documentation>
+                   Сумма оплаты данным средством оплаты в валюте чека.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Payment">
+		<xs:annotation>
+			<xs:documentation>
+             Набор данных оплаты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:PaymentItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                   Элемент набора данных оплаты.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ChequeItemAttr">
+		<xs:annotation>
+			<xs:documentation>Свойство товара по позиции в чеке.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:documentation>Наименование свойства</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="256"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="value" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Значение свойства</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ChequeItemAttrSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Набор свойств товара по позиции в чеке.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:ChequeItemAttr" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+Свойство товара
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ChequeItem">
+		<xs:annotation>
+			<xs:documentation>
+             Позиция чека по товару.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="product">
+				<xs:annotation>
+					<xs:documentation>
+                   Код товара по справочнику товаров.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="quantity">
+				<xs:annotation>
+					<xs:documentation>
+                   Количество товара в единицах измерения товара.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:float">
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amount">
+				<xs:annotation>
+					<xs:documentation>
+                   Стоимость за указанное количество товара в валюте чека.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="position" type="xs:unsignedLong" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Номер позиции в чеке</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="attributes" type="ns:ChequeItemAttrSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дополнительные свойства товара по позиции в чеке</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Cheque">
+		<xs:annotation>
+			<xs:documentation>
+             Данные чека по товарам.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:ChequeItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+                   Набор позиций чека по товарам.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AllocChequeItem">
+		<xs:annotation>
+			<xs:documentation>
+             Элемент распределения оплаты баллами по позициям чека.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="product">
+				<xs:annotation>
+					<xs:documentation>Код товара по справочнику товаров.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="quantity">
+				<xs:annotation>
+					<xs:documentation>Количество товара в единицах измерения товара.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:float">
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="pointsAmount">
+				<xs:annotation>
+					<xs:documentation>Часть стоимости за указанное количество товара в валюте чека, оплаченная баллами.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AllocCheque">
+		<xs:annotation>
+			<xs:documentation>
+             Распределение оплаты баллами по позициям чека.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:AllocChequeItem" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Набор позиций распределения оплаты баллами по товарам чека.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PointsAllocation">
+		<xs:annotation>
+			<xs:documentation>Элемент распределения оплаты баллами. Содержит информацию о максимально возможной сумме к оплате баллами по чеку или распределение оплаты баллами по позициям чека.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="minChequePoints" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Минимально возможная сумма к оплате баллами по чеку.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="maxChequePoints" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Максимально возможная сумма к оплате баллами по чеку.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="allocCheque" type="ns:AllocCheque" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Распределение оплаты баллами по позициям чека.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AuthRequestData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные запроса авторизации.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="transaction" type="ns:TransactionData">
+				<xs:annotation>
+					<xs:documentation>
+                   Общие данные транзакции.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="amount">
+				<xs:annotation>
+					<xs:documentation>
+                   Общая сумма чека.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="currency">
+				<xs:annotation>
+					<xs:documentation>
+                   Валюта чека (числовой код по ISO 4217, см: http://www.iso.org/iso/en/prods-services/popstds/currencycodeslist.html)
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="payment" type="ns:Payment" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Информация об оплате. Обязателен для метода authPoints. Отсутствует для методов activate и authGift.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cheque" type="ns:Cheque" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Состав чека.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="authentication" type="ns:Authentication" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Данные для проверки подлинности авторизации.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cashBack" type="ns:AuthCashBackOperSeq" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DirectRequestData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные запроса прямого изменения бонусного остатка.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="transaction" type="ns:TransactionData">
+				<xs:annotation>
+					<xs:documentation>
+                   Общие данные транзакции.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="amount">
+				<xs:annotation>
+					<xs:documentation>
+                   Сумма бонусов к начислению или списанию.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="promoId" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор акции в ПЦ, по которой производить начисление.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InfoRequestData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные запроса информации.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="transaction" type="ns:TransactionData">
+				<xs:annotation>
+					<xs:documentation>
+                   Общие данные транзакции.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cheque" type="ns:Cheque" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Состав чека.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="getCardholder" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Флаг (0 - по умолчанию или 1) формирования информации о держателе карты в ответе на операцию.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="getAccStatement" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Флаг (0 - по умолчанию или 1) формирования выписки по счету карты или держателя карты в ответе на операцию. Количество операций определяется передачей дополнительного параметра, который переопределяет настройки в ПЦ. Колчество возвращаемых операций не превышает 200.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="accStatementParams" type="ns:AccStatementParams" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+               Параметры формирования выписки.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="getPreCalcBns" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Флаг (0 - по умолчанию или 1) предварительного расчета бонусов по чеку, без движений по счетам.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="currency" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>                   Валюта последующих операций, например, оплата бонусами. (числовой код по ISO 4217, см: http://www.iso.org/iso/en/prods-services/popstds/currencycodeslist.html). Если данный атрибут не передается, то используется умолчательная  валюта сети.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="getBnsActiveRestrictInfo" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> «Флаг» формирования информации об активных маркированных баллах с ограничением на списание. Принимает значения 0 (не формировать; по умолчанию) или 1 (формировать).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CardholderRequestData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные запроса изменения данных держателя карты.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="transaction" type="ns:TransactionData">
+				<xs:annotation>
+					<xs:documentation>
+                   Общие данные транзакции.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="cardholderInfo" type="ns:CardholderInfoSeq">
+					<xs:annotation>
+						<xs:documentation>
+                   Информация о держателе карты.
+               </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="formOptions" type="ns:FormOptionsSeq">
+					<xs:annotation>
+						<xs:documentation>
+                   Набор атрибутов или свойств анкеты.
+               </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="getCardholder" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Флаг (0 - по умолчанию или 1) формирования информации о держателе карты в ответе на операцию.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="getAccStatement" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Флаг (0 - по умолчанию или 1) формирования выписки по счету карты или держателя карты в ответе на операцию. Количество операций определяется передачей дополнительного параметра, который переопределяет настройки в ПЦ. Колчество возвращаемых операций не превышает 200.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="accStatementParams" type="ns:AccStatementParams" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Параметры формирования выписки.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AuthResponseData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные ответа на запрос авторизации.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="status" type="ns:ResponseStatus">
+				<xs:annotation>
+					<xs:documentation>
+                   Статус ответа.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="pcId" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Уникальный идентификатор транзакции, присвоенный ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cardInfo" type="ns:CardInfo" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Обязательно присутствует, если status.code=OK или status.code=NOT_ENOUGH_POINTS.
+                   Информация по карте. Содержит актуальную информацию о счете карты или держателя карты на момент после выполнения текущего запроса. Обязательно присутствует при успешном выполнении запроса (status.code=OK) или при недостаточном балансе счета карты или держателя карты, т.е. если на счету меньше бонусов, чем должно быть списано в результате операции authPoints (status.code=NOT_ENOUGH_POINTS).
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fmtCardInfo" type="ns:FmtCardInfo" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Состояния элементов счета клиента в форматированном (готовом к печати) виде.
+                   Обязательно присутствует, если status.code=OK или status.code=NOT_ENOUGH_POINTS.
+                   Информация по карте. Содержит актуальную информацию о счете карты или держателя карты на момент после выполнения текущего запроса. Обязательно присутствует при успешном выполнении запроса (status.code=OK) или при недостаточном балансе счета карты или держателя карты, т.е. если на счету меньше бонусов, чем должно быть списано в результате операции authPoints (status.code=NOT_ENOUGH_POINTS).
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="chequeMessage" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Опциональное сообщение для печати на чеке. Язык: русский, кодировка: UTF-8.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="operatorMessage" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Опциональное сообщение для отображения кассиру. Язык: русский, кодировка: UTF-8.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="pointsAllocation" type="ns:PointsAllocation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Распределение оплаты баллами.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cardholderInfo" type="ns:CardholderInfoSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                  Информация о держателе карты.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="accStatementInfo" type="ns:AccStatementSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+               Выписка со счета карты или держателя карты. Содержит информацию об определённом количестве последних операций по счету карты или держателя карты на момент после выполнения текущего запроса. Количество операций определяется настройками в ПЦ и не превышает 200.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="eventInfo" type="ns:EventSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Список событий</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="preCalculatedBns" type="ns:PreCalculatedBns" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Предварительно рассчитанные бонусы по чеку, без движений по счетам. Суммы конвертируются в валюту, указанную в InfoRequestData.currency. Если InfoRequestData.currency не указана, используется умолчательная валюта сети.
+                    </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bnsActiveRestrictInfo" type="ns:BnsActiveRestrictInfo" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Структура предназначена для передачи информации об активных маркированных баллах с ограничение на списание.
+                    </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BatchRequestItem">
+		<xs:annotation>
+			<xs:documentation>
+             Вспомогательный тип - либо AuthRequestData, либо RefundRequestData.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="authData" type="ns:AuthRequestData" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные offline-операции начисления бонусов.
+                  </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="refundData" type="ns:RefundRequestData" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+                      Данные offline-операции возврата товаров.
+                  </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="setCardHolder" type="ns:CardholderRequestData" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Данные offline-операции обновления данных держателя карты</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BatchRequestSequence">
+		<xs:annotation>
+			<xs:documentation>
+             Вспомогательный тип - последовательность BatchRequestItem.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:BatchRequestItem" maxOccurs="100">
+				<xs:annotation>
+					<xs:documentation>
+                   Собственно последовательность.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BatchRequestData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные операции пакетного учета неавторизованных операций начисления бонусов или возврата товаров.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="sequence" type="ns:BatchRequestSequence">
+				<xs:annotation>
+					<xs:documentation>
+                   Набор (пакет) данных об операциях начисления бонусов или возврата товаров, которые не были авторизованы online.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RefundRequestData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные запроса возврата товара.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="transaction" type="ns:TransactionData">
+				<xs:annotation>
+					<xs:documentation>
+                   Общие данные транзакции для операции возврата.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="payment" type="ns:Payment" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Информация о суммах возвращаемых покупателю денег (НЕ бонусов) по различным средствам оплаты. Присутствует при возвратах offline (через batchLoad).
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="amount">
+				<xs:annotation>
+					<xs:documentation>
+                   Общая стоимость возвращаемых покупателем товаров.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="currency">
+				<xs:annotation>
+					<xs:documentation>
+                   Валюта чека (числовой код по ISO 4217, см: http://www.iso.org/iso/en/prods-services/popstds/currencycodeslist.html)
+                   Должна совпадать с валютой оригинальной транзакции (операции покупки, возврат которой производится).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="origId">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор оригинальной транзакции.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="origTerminal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор кассы – источника оригинальной транзакции.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="origLocation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Код места установки POS’а – источника оригинальной транзакции.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="origPartnerId" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор Участника – источника оригинальной транзакции, под которым он зарегистрирован в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cheque" type="ns:Cheque" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Состав чека возврата (возвращаемые товары).
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RefundResponseData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные ответа на запрос возврата товара.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="authRes" type="ns:AuthResponseData">
+				<xs:annotation>
+					<xs:documentation>
+                   Общие данные результата обработки авторизационного запроса.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="payment" type="ns:Payment" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Информация о суммах возвращаемых покупателю денег (НЕ бонусов) по различным средствам оплаты.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TokenResponseData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные ответа на запрос токена.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="status" type="ns:ResponseStatus">
+				<xs:annotation>
+					<xs:documentation>
+                   Статус ответа.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="validThrough" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Срок действия токена по времени ПЦ в формате YYYYMMDDhhmmss.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InfoDealsResponseData">
+		<xs:annotation>
+			<xs:documentation>
+             Ответ на запрос расширенного списка купонов по карте.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="authRes" type="ns:AuthResponseData">
+				<xs:annotation>
+					<xs:documentation>
+                  Общие данные результата обработки запроса.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deals" type="ns:DealSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Список доступных клиенту купонов.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dealTypes" type="ns:DealTypeSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Список купонных предложений. Присутствует при наличии доступных купонов.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Deal">
+		<xs:annotation>
+			<xs:documentation>
+             Информация о купоне.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор купона в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="typeId" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор купонного предложения в ПЦ. Отсутствует для метода authDeals.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IssuedDeal">
+		<xs:annotation>
+			<xs:documentation>
+             Информация о купоне для выпуска.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="typeId">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор купонного предложения в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="startDate" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Дата начала действия купона в формате YYYYMMDDhhmmss. 
+Наличие значения в данном поле влечет для купона переопределение даты начала действия и даты завершения действия купонного предложения.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="endDate" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Дата завершения действия купона в формате YYYYMMDDhhmmss. 
+Наличие значения в данном поле влечет для купона переопределение даты начала действия и даты завершения действия купонного предложения.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DealSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Массив купонов.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:Deal" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DealType">
+		<xs:annotation>
+			<xs:documentation>
+             Информация о купонном предложении и конфигурационных параметрах купонного предложения для кассы.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id">
+				<xs:annotation>
+					<xs:documentation>
+                   Идентификатор купонного предложения в ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:documentation>
+                   Короткое название купонного предложения.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="desc">
+				<xs:annotation>
+					<xs:documentation>
+                   Развернутое описание купонного предложения.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="exclusive">
+				<xs:annotation>
+					<xs:documentation>
+                   Флаг "эксклюзивности". Определяет возможность совместного использования данного купона с другими купонами. Допустимые значения:
+                   - "y" – эксклюзивный купон: использование данного купона должно запрещать на кассе использование других купонов.
+                   - "n" – неэксклюзивный купон: возможно совместное использование на кассе данного купона с другими доступными не эксклюзивными купонами.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="condRules" type="ns:ConditionRuleSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Условные правила купонного предложения. Условных правил может быть несколько в рамках купонного предложения. В этом случае правила складываются по "И", т.е. для разрешения применения купона должны быть выполнены все условные правила.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dscRules" type="ns:DiscountRuleSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Скидочные правила купонного предложения.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DealTypeSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Массив купонных предложений.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:DealType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConditionRule">
+		<xs:annotation>
+			<xs:documentation>
+             Параметры условного правила.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="minQnt">
+				<xs:annotation>
+					<xs:documentation>
+                   Минимальное количество товара, которое должно быть в чеке, для разрешения применения купона. Правило срабатывает при наличии в чеке хотя бы одного артикула товара из товарной группы с количеством большим или равным указанному. Если значение равно 0 (ноль), то считать, что данное ограничение на срабатывание правила отсутствует.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:float">
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:choice minOccurs="0">
+				<xs:element name="prodGrp" type="ns:ProductGroup">
+					<xs:annotation>
+						<xs:documentation>
+                   Товарная группа.
+               </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="prodGrpUse">
+					<xs:annotation>
+						<xs:documentation>
+                   Вариант использования товарной группы. Присутствует при наличии атрибута prodGrp. Допустимые значения:
+                   - "I" – включающая товарная группа
+                   - "E" – исключающая товарная группа
+               </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConditionRuleSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Массив условных правил для купонных предложений.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:ConditionRule" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DiscountRule">
+		<xs:annotation>
+			<xs:documentation>
+             Параметры правила для расчета скидки (скидочного правила).
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="calcParams" type="ns:CalculationParams">
+				<xs:annotation>
+					<xs:documentation>
+                   Значения параметров функции расчета скидки.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="lowBoundQnt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Количество товара, с которого (включительно) действует скидочное правило.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:float">
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="highBoundQnt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Количество товара, до которого (включительно) действует скидочное правило.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:float">
+						<xs:minExclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:choice minOccurs="0">
+				<xs:element name="prodGrp" type="ns:ProductGroup">
+					<xs:annotation>
+						<xs:documentation>
+                   Товарная группа.
+               </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="prodGrpUse">
+					<xs:annotation>
+						<xs:documentation>
+                   Вариант использования товарной группы. Присутствует при наличии атрибута prodGrp. Допустимые значения:
+                   - "I" – включающая товарная группа
+                   - "E" – исключающая товарная группа
+               </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DiscountRuleSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Массив скидочных правил для купонных предложений.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:DiscountRule" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CalculationParams">
+		<xs:annotation>
+			<xs:documentation>
+             Параметры функции расчета скидки.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="fix">
+				<xs:annotation>
+					<xs:documentation>
+                   Фиксированное значение скидки (большее либо равное 0), в минимальных единицах валюты (например, копейках).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="percent">
+				<xs:annotation>
+					<xs:documentation>
+                   Процент скидки в сотых долях процента (от 0 до 10000).
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:maxInclusive value="10000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="minResult" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Ограничение "значение не менее", в минимальных единицах валюты.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="maxResult" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Ограничение "значение не более", в минимальных единицах валюты.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProductGroup">
+		<xs:annotation>
+			<xs:documentation>
+             Состав товарной группы.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="products" type="ns:String50Seq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Список кодов товаров.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="templates" type="ns:String50Seq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Список масок кодов товаров.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="classifiers" type="ns:ProductClassifierSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Список классификаций кодов товаров.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="String50Seq">
+		<xs:annotation>
+			<xs:documentation>
+             Массив строк, каждая длиной до 50 символов.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" maxOccurs="unbounded">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProductClassifier">
+		<xs:annotation>
+			<xs:documentation>
+             Параметр классификации.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:documentation>
+                   Имя параметра.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="value">
+				<xs:annotation>
+					<xs:documentation>
+                   Значение параметра.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProductClassifierSeq">
+		<xs:annotation>
+			<xs:documentation>
+             Массив параметров классификации.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:ProductClassifier" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AuthDealsRequestData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные запроса на гашение купонов.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="transaction" type="ns:TransactionData">
+				<xs:annotation>
+					<xs:documentation>
+                   Общие данные транзакции.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deals" type="ns:DealSeq">
+				<xs:annotation>
+					<xs:documentation>
+                   Список купонов, которые требуется погасить на ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IssueDealRequestData">
+		<xs:annotation>
+			<xs:documentation>
+             Данные запроса на выпуск купона по карте.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="transaction" type="ns:TransactionData">
+				<xs:annotation>
+					<xs:documentation>
+                   Общие данные транзакции.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deal" type="ns:IssuedDeal">
+				<xs:annotation>
+					<xs:documentation>
+                   Данные о купоне, который требуется зарегистрировать по карте на ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IssueDealResponseData">
+		<xs:annotation>
+			<xs:documentation>
+             Ответ на запрос на выпуск купона по карте.
+         </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="authRes" type="ns:AuthResponseData">
+				<xs:annotation>
+					<xs:documentation>
+                  Общие данные результата обработки запроса.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deal" type="ns:Deal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+                   Информация о купоне, зарегистрированном по карте в результате запроса.
+               </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PreCalculatedBns">
+		<xs:annotation>
+			<xs:documentation>
+             Предварительно расчитанные бонусы по чеку, без движения по счетам
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Active">
+				<xs:annotation>
+					<xs:documentation>
+                    Сумма активных бонусов
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Inactive">
+				<xs:annotation>
+					<xs:documentation>
+                    Сумма неактивных бонусов
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CashBackOper">
+		<xs:annotation>
+			<xs:documentation>             Информация о покупке, по которой можно сделать кэшбэк</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="pcId">
+				<xs:annotation>
+					<xs:documentation>Уникальный идентификатор транзакции, присвоенный ПЦ.
+               </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cardNum">
+				<xs:annotation>
+					<xs:documentation>Номер карты. Может быть как HASH или BARCODE, или PAN.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="128"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="currency">
+				<xs:annotation>
+					<xs:documentation>Валюта счета карты.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amount">
+				<xs:annotation>
+					<xs:documentation>Сумма покупки.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:totalDigits value="18"/>
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="merchName">
+				<xs:annotation>
+					<xs:documentation>Наименование мерчанта.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="dtime">
+				<xs:annotation>
+					<xs:documentation>Локальная дата и время совершения покупки в формате YYYYMMDDHH24MISS</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="rate" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Курс конвертации валюты счета в бонусы</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:float"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="minCashBack" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Нижний порог возмещения</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="maxCashBack" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Верхний порог возмещения</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cashBackAmount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Доступная сумма возмещения (в минимальных единицах валюты)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="bonusCostAmount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Необходимая сумма бонусов для возмещения (в минимальных единицах)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long"/>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CashBackOperSeq">
+		<xs:annotation>
+			<xs:documentation>             Массив с покупками, по которым можно сделать кэшбэк</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:CashBackOper" maxOccurs="50"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InfoCashBackResponseData">
+		<xs:annotation>
+			<xs:documentation>             Ответ на запрос получения списка покупок, предполагающих возмещение</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="status" type="ns:ResponseStatus">
+				<xs:annotation>
+					<xs:documentation>Статус ответа.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="availBnsBalance" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Текущий остаток бонусных баллов.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cashBackOpers" type="ns:CashBackOperSeq" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Массив с покупками, по которым можно сделать кэшбэк</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AuthCashBackOper">
+		<xs:annotation>
+			<xs:documentation>             Операция по которой нужно сделать кэшбэк</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="pcId">
+				<xs:annotation>
+					<xs:documentation>Уникальный идентификатор транзакции, присвоенный ПЦ.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amount">
+				<xs:annotation>
+					<xs:documentation>Сумма на которую надо сделать кэшбэк</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="0"/>
+						<xs:totalDigits value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AuthCashBackOperSeq">
+		<xs:annotation>
+			<xs:documentation>             Массив операций по которым нужно сделать кэшбэк</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" type="ns:AuthCashBackOper" maxOccurs="50"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BnsActiveRestrictInfo">
+		<xs:annotation>
+			<xs:documentation>Структура предназначена для передачи информации об активных маркированных баллах с ограничение на списание.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="item" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="promoName">
+							<xs:annotation>
+								<xs:documentation>Наименование акции, по которой начислялись баллы</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="400"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="restrictNote">
+							<xs:annotation>
+								<xs:documentation>Описание ограничения по списанию баллов</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="400"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="amount">
+							<xs:annotation>
+								<xs:documentation>Сумма бонусов в минимальных единицах (баллокопейках). </xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:long">
+									<xs:minInclusive value="0"/>
+									<xs:totalDigits value="18"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
